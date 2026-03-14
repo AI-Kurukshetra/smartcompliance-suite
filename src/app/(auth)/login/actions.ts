@@ -11,9 +11,9 @@ export async function sendMagicLink(formData: FormData) {
     redirect("/login?error=missing-email");
   }
 
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   const origin =
-    headers().get("origin") ?? process.env.NEXT_PUBLIC_SITE_URL ?? "";
+    (await headers()).get("origin") ?? process.env.NEXT_PUBLIC_SITE_URL ?? "";
 
   const { error } = await supabase.auth.signInWithOtp({
     email,

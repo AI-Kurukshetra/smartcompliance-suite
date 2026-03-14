@@ -2,11 +2,12 @@ import Link from "next/link";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 interface SearchPageProps {
-  searchParams: { q?: string };
+  searchParams: Promise<{ q?: string }>;
 }
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
-  const query = searchParams.q?.trim() ?? "";
+  const { q } = await searchParams;
+  const query = q?.trim() ?? "";
   const supabase = createSupabaseAdminClient();
 
   const [customersResult, casesResult, documentsResult] = query

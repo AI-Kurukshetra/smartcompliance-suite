@@ -2,12 +2,11 @@ import Link from "next/link";
 import { sendMagicLink } from "./actions";
 
 interface LoginPageProps {
-  searchParams: { success?: string; error?: string };
+  searchParams: Promise<{ success?: string; error?: string }>;
 }
 
-export default function LoginPage({ searchParams }: LoginPageProps) {
-  const success = searchParams.success;
-  const error = searchParams.error;
+export default async function LoginPage({ searchParams }: LoginPageProps) {
+  const { success, error } = await searchParams;
   const errorMessage =
     error === "signin-required"
       ? "Please sign in to continue."

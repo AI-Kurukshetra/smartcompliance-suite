@@ -6,17 +6,18 @@ import QuickUpdate from "@/components/QuickUpdate";
 import { updateDocumentStatus } from "./actions";
 
 interface DocumentDetailPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export default async function DocumentDetailPage({ params }: DocumentDetailPageProps) {
+  const { id } = await params;
   const supabase = createSupabaseAdminClient();
   const { data: document } = await supabase
     .from("identity_documents")
     .select(
       "id,doc_type,status,country,created_at,customers(id,full_name,email),case_files(id,notes,cases(id,title))"
     )
-    .eq("id", params.id)
+    .eq("id", id)
     .single();
 
   if (!document) {

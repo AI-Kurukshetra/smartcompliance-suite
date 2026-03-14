@@ -5,10 +5,11 @@ import { updateWatchlistStatus } from "./update";
 import { updateWatchlistBulk } from "./bulk";
 
 interface WatchlistPageProps {
-  searchParams: { success?: string; error?: string };
+  searchParams: Promise<{ success?: string; error?: string }>;
 }
 
 export default async function WatchlistPage({ searchParams }: WatchlistPageProps) {
+  const { error } = await searchParams;
   const supabase = createSupabaseAdminClient();
   const { data: matches } = await supabase
     .from("watchlist_matches")
@@ -22,18 +23,18 @@ export default async function WatchlistPage({ searchParams }: WatchlistPageProps
     .order("full_name", { ascending: true });
 
   const errorMessage =
-    searchParams.error === "missing-list"
+    error === "missing-list"
       ? "List name is required."
-      : searchParams.error === "missing-match"
+      : error === "missing-match"
         ? "Select a match first."
-        : searchParams.error === "match-not-found"
+        : error === "match-not-found"
           ? "Match not found."
-          : searchParams.error === "no-selection"
+          : error === "no-selection"
             ? "Select at least one match for bulk actions."
-            : searchParams.error === "no-bulk-update"
+            : error === "no-bulk-update"
               ? "Choose a status to update."
-              : searchParams.error
-                ? decodeURIComponent(searchParams.error)
+              : error
+                ? decodeURIComponent(error)
                 : null;
 
   return (

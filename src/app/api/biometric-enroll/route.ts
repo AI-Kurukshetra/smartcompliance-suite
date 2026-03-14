@@ -55,7 +55,7 @@ export async function POST(request: Request) {
         enrolled_at: new Date().toISOString()
       }
     ],
-    { onConflict: ["customer_id", "template_hash"] }
+    { onConflict: "customer_id,template_hash" }
   );
 
   if (error) {

@@ -6,17 +6,18 @@ import QuickUpdate from "@/components/QuickUpdate";
 import { updateCustomerRiskLevel, updateCustomerStatus } from "./actions";
 
 interface CustomerDetailPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export default async function CustomerDetailPage({ params }: CustomerDetailPageProps) {
+  const { id } = await params;
   const supabase = createSupabaseAdminClient();
   const { data: customer } = await supabase
     .from("customers")
     .select(
       "id,full_name,email,status,risk_level,jurisdiction,created_at,risk_profiles(score,level,last_assessed_at)"
     )
-    .eq("id", params.id)
+    .eq("id", id)
     .single();
 
   if (!customer) {

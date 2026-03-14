@@ -9,10 +9,11 @@ import {
 } from "./update";
 
 interface CasesPageProps {
-  searchParams: { success?: string; error?: string };
+  searchParams: Promise<{ success?: string; error?: string }>;
 }
 
 export default async function CasesPage({ searchParams }: CasesPageProps) {
+  const { error } = await searchParams;
   const supabase = createSupabaseAdminClient();
   const { data: cases } = await supabase
     .from("cases")
@@ -26,14 +27,14 @@ export default async function CasesPage({ searchParams }: CasesPageProps) {
     .order("full_name", { ascending: true });
 
   const errorMessage =
-    searchParams.error === "missing-title"
+    error === "missing-title"
       ? "Case title is required."
-      : searchParams.error === "no-selection"
+      : error === "no-selection"
         ? "Select at least one case for bulk actions."
-        : searchParams.error === "no-bulk-update"
+        : error === "no-bulk-update"
           ? "Choose a status or priority to update."
-          : searchParams.error
-            ? decodeURIComponent(searchParams.error)
+          : error
+            ? decodeURIComponent(error)
             : null;
 
   return (

@@ -5,10 +5,11 @@ import { updateSessionStatus } from "./update";
 import { updateSessionsBulk } from "./bulk";
 
 interface SessionsPageProps {
-  searchParams: { success?: string; error?: string };
+  searchParams: Promise<{ success?: string; error?: string }>;
 }
 
 export default async function SessionsPage({ searchParams }: SessionsPageProps) {
+  const { error } = await searchParams;
   const supabase = createSupabaseAdminClient();
   const { data: sessions } = await supabase
     .from("verification_sessions")
@@ -22,14 +23,14 @@ export default async function SessionsPage({ searchParams }: SessionsPageProps) 
     .order("full_name", { ascending: true });
 
   const errorMessage =
-    searchParams.error === "missing-provider"
+    error === "missing-provider"
       ? "Provider name is required."
-      : searchParams.error === "no-selection"
+      : error === "no-selection"
         ? "Select at least one session for bulk actions."
-        : searchParams.error === "no-bulk-update"
+        : error === "no-bulk-update"
           ? "Choose a status to update."
-          : searchParams.error
-            ? decodeURIComponent(searchParams.error)
+          : error
+            ? decodeURIComponent(error)
             : null;
 
   return (

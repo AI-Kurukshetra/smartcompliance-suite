@@ -6,17 +6,18 @@ import QuickUpdate from "@/components/QuickUpdate";
 import { updateCasePriority, updateCaseStatus } from "./actions";
 
 interface CaseDetailPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export default async function CaseDetailPage({ params }: CaseDetailPageProps) {
+  const { id } = await params;
   const supabase = createSupabaseAdminClient();
   const { data: caseItem } = await supabase
     .from("cases")
     .select(
       "id,title,priority,status,created_at,customers(id,full_name,email),case_files(id,notes,identity_documents(id,doc_type,country))"
     )
-    .eq("id", params.id)
+    .eq("id", id)
     .single();
 
   if (!caseItem) {

@@ -3,10 +3,11 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createCustomer } from "./actions";
 
 interface CustomersPageProps {
-  searchParams: { success?: string; error?: string };
+  searchParams: Promise<{ success?: string; error?: string }>;
 }
 
 export default async function CustomersPage({ searchParams }: CustomersPageProps) {
+  const { error } = await searchParams;
   const supabase = createSupabaseAdminClient();
   const { data: customers } = await supabase
     .from("customers")
@@ -17,10 +18,10 @@ export default async function CustomersPage({ searchParams }: CustomersPageProps
     .limit(20);
 
   const errorMessage =
-    searchParams.error === "missing-name"
+    error === "missing-name"
       ? "Customer name is required."
-      : searchParams.error
-        ? decodeURIComponent(searchParams.error)
+      : error
+        ? decodeURIComponent(error)
         : null;
 
   return (

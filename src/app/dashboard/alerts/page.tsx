@@ -5,10 +5,11 @@ import { updateAlertStatus } from "./update";
 import { updateAlertsBulk } from "./bulk";
 
 interface AlertsPageProps {
-  searchParams: { success?: string; error?: string };
+  searchParams: Promise<{ success?: string; error?: string }>;
 }
 
 export default async function AlertsPage({ searchParams }: AlertsPageProps) {
+  const { error } = await searchParams;
   const supabase = createSupabaseAdminClient();
   const { data: alerts } = await supabase
     .from("alerts")
@@ -22,14 +23,14 @@ export default async function AlertsPage({ searchParams }: AlertsPageProps) {
     .order("full_name", { ascending: true });
 
   const errorMessage =
-    searchParams.error === "missing-message"
+    error === "missing-message"
       ? "Alert message is required."
-      : searchParams.error === "no-selection"
+      : error === "no-selection"
         ? "Select at least one alert for bulk actions."
-        : searchParams.error === "no-bulk-update"
+        : error === "no-bulk-update"
           ? "Choose a status to update."
-          : searchParams.error
-            ? decodeURIComponent(searchParams.error)
+          : error
+            ? decodeURIComponent(error)
             : null;
 
   return (

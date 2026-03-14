@@ -6,10 +6,11 @@ import { updateDocumentsBulk } from "./bulk";
 import { createDocument } from "./actions";
 
 interface DocumentsPageProps {
-  searchParams: { success?: string; error?: string };
+  searchParams: Promise<{ success?: string; error?: string }>;
 }
 
 export default async function DocumentsPage({ searchParams }: DocumentsPageProps) {
+  const { error } = await searchParams;
   const supabase = createSupabaseAdminClient();
   const { data: documents } = await supabase
     .from("identity_documents")
@@ -23,14 +24,14 @@ export default async function DocumentsPage({ searchParams }: DocumentsPageProps
     .order("full_name", { ascending: true });
 
   const errorMessage =
-    searchParams.error === "missing-type"
+    error === "missing-type"
       ? "Document type is required."
-      : searchParams.error === "no-selection"
+      : error === "no-selection"
         ? "Select at least one document for bulk actions."
-        : searchParams.error === "no-bulk-update"
+        : error === "no-bulk-update"
           ? "Choose a status to update."
-          : searchParams.error
-            ? decodeURIComponent(searchParams.error)
+          : error
+            ? decodeURIComponent(error)
             : null;
 
   return (

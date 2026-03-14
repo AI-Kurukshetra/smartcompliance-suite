@@ -2,10 +2,11 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createRule } from "./actions";
 
 interface RulesPageProps {
-  searchParams: { success?: string; error?: string };
+  searchParams: Promise<{ success?: string; error?: string }>;
 }
 
 export default async function RulesPage({ searchParams }: RulesPageProps) {
+  const { error } = await searchParams;
   const supabase = createSupabaseAdminClient();
   const { data: rules } = await supabase
     .from("compliance_rules")
@@ -14,12 +15,12 @@ export default async function RulesPage({ searchParams }: RulesPageProps) {
     .limit(20);
 
   const errorMessage =
-    searchParams.error === "missing-name"
+    error === "missing-name"
       ? "Rule name is required."
-      : searchParams.error === "invalid-json"
+      : error === "invalid-json"
         ? "Rules JSON is invalid."
-        : searchParams.error
-          ? decodeURIComponent(searchParams.error)
+        : error
+          ? decodeURIComponent(error)
           : null;
 
   return (

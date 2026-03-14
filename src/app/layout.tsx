@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, Spline_Sans, JetBrains_Mono } from "next/font/google";
+import { Suspense } from "react";
 import "./globals.css";
 import Toast from "@/components/Toast";
 
@@ -34,7 +35,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${display.variable} ${body.variable} ${mono.variable}`}>
       <body className="bg-midnight text-frost">
-        <Toast />
+        <Suspense fallback={null}>
+          <Toast />
+        </Suspense>
         {children}
       </body>
     </html>

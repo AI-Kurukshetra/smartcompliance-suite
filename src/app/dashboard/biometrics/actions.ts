@@ -37,7 +37,7 @@ export async function enrollBiometricTemplate(formData: FormData) {
         enrolled_at: new Date().toISOString()
       }
     ],
-    { onConflict: ["customer_id", "template_hash"] }
+    { onConflict: "customer_id,template_hash" }
   );
 
   if (error) {

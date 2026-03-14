@@ -2,10 +2,11 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createDataSource } from "./actions";
 
 interface DataSourcesPageProps {
-  searchParams: { success?: string; error?: string };
+  searchParams: Promise<{ success?: string; error?: string }>;
 }
 
 export default async function DataSourcesPage({ searchParams }: DataSourcesPageProps) {
+  const { error } = await searchParams;
   const supabase = createSupabaseAdminClient();
   const { data: sources } = await supabase
     .from("data_sources")
@@ -14,12 +15,12 @@ export default async function DataSourcesPage({ searchParams }: DataSourcesPageP
     .limit(20);
 
   const errorMessage =
-    searchParams.error === "missing-name"
+    error === "missing-name"
       ? "Data source name is required."
-      : searchParams.error === "invalid-json"
+      : error === "invalid-json"
         ? "Config JSON is invalid."
-        : searchParams.error
-          ? decodeURIComponent(searchParams.error)
+        : error
+          ? decodeURIComponent(error)
           : null;
 
   return (

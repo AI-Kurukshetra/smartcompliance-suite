@@ -2,10 +2,11 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { upsertRiskProfile } from "./actions";
 
 interface RiskProfilesPageProps {
-  searchParams: { success?: string; error?: string };
+  searchParams: Promise<{ success?: string; error?: string }>;
 }
 
 export default async function RiskProfilesPage({ searchParams }: RiskProfilesPageProps) {
+  const { error } = await searchParams;
   const supabase = createSupabaseAdminClient();
   const { data: profiles } = await supabase
     .from("risk_profiles")
@@ -19,12 +20,12 @@ export default async function RiskProfilesPage({ searchParams }: RiskProfilesPag
     .order("full_name", { ascending: true });
 
   const errorMessage =
-    searchParams.error === "missing-customer"
+    error === "missing-customer"
       ? "Customer is required."
-      : searchParams.error === "invalid-json"
+      : error === "invalid-json"
         ? "Factors JSON is invalid."
-        : searchParams.error
-          ? decodeURIComponent(searchParams.error)
+        : error
+          ? decodeURIComponent(error)
           : null;
 
   return (

@@ -755,7 +755,7 @@ async function seed() {
     const { error: relationshipError } = await supabase
       .from("customer_relationships")
       .upsert(customerRelationships, {
-        onConflict: ["primary_customer_id", "related_customer_id"]
+        onConflict: "primary_customer_id,related_customer_id"
       });
     if (relationshipError) throw relationshipError;
   }

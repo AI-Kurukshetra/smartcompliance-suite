@@ -2,10 +2,11 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createCaseFile } from "./actions";
 
 interface CaseFilesPageProps {
-  searchParams: { success?: string; error?: string };
+  searchParams: Promise<{ success?: string; error?: string }>;
 }
 
 export default async function CaseFilesPage({ searchParams }: CaseFilesPageProps) {
+  const { error, success } = await searchParams;
   const supabase = createSupabaseAdminClient();
   const { data: caseFiles } = await supabase
     .from("case_files")
@@ -26,10 +27,10 @@ export default async function CaseFilesPage({ searchParams }: CaseFilesPageProps
     .order("created_at", { ascending: false });
 
   const errorMessage =
-    searchParams.error === "missing-case"
+    error === "missing-case"
       ? "Case selection is required."
-      : searchParams.error
-        ? decodeURIComponent(searchParams.error)
+      : error
+        ? decodeURIComponent(error)
         : null;
 
   return (
@@ -84,7 +85,7 @@ export default async function CaseFilesPage({ searchParams }: CaseFilesPageProps
               Save case file
             </button>
           </form>
-          {searchParams.success && (
+          {success && (
             <p className="mt-4 text-sm text-neon">Case file saved.</p>
           )}
           {errorMessage && <p className="mt-4 text-sm text-ember">{errorMessage}</p>}

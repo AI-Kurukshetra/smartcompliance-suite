@@ -2,10 +2,11 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createReport } from "./actions";
 
 interface ReportsPageProps {
-  searchParams: { success?: string; error?: string };
+  searchParams: Promise<{ success?: string; error?: string }>;
 }
 
 export default async function ReportsPage({ searchParams }: ReportsPageProps) {
+  const { error } = await searchParams;
   const supabase = createSupabaseAdminClient();
   const { data: reports } = await supabase
     .from("reports")
@@ -14,10 +15,10 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
     .limit(20);
 
   const errorMessage =
-    searchParams.error === "missing-type"
+    error === "missing-type"
       ? "Report type is required."
-      : searchParams.error
-        ? decodeURIComponent(searchParams.error)
+      : error
+        ? decodeURIComponent(error)
         : null;
 
   return (
