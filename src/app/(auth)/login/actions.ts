@@ -1,8 +1,8 @@
 "use server";
 
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { resolveSiteUrl } from "@/lib/site-url";
 
 export async function sendMagicLink(formData: FormData) {
   const email = formData.get("email");
@@ -12,8 +12,7 @@ export async function sendMagicLink(formData: FormData) {
   }
 
   const supabase = await createSupabaseServerClient();
-  const origin =
-    (await headers()).get("origin") ?? process.env.NEXT_PUBLIC_SITE_URL ?? "";
+  const origin = await resolveSiteUrl();
 
   const { error } = await supabase.auth.signInWithOtp({
     email,
